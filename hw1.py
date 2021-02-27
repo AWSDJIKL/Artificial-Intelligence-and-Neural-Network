@@ -1,3 +1,4 @@
+#作业1
 # 1-3
 import numpy as np
 import numpy.matlib
