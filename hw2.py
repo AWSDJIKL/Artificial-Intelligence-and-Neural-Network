@@ -52,4 +52,6 @@ plt.show()
 
 # 显示函数整体曲线，方便观察收敛值是否正常
 plt.plot(np.arange(-5, 5, 0.001), y(np.arange(-5, 5, 0.001)))
+plt.xlabel("x")
+plt.ylabel("y")
 plt.show()
