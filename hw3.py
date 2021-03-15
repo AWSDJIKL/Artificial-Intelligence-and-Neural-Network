@@ -24,13 +24,13 @@ def classify(w, x_list, y_list):
     correct = 0
     for x, y in zip(x_list, y_list):
         # 结果同号，说明预测正确
-        if np.dot(w.T, x) * y > 0:
+        if np.dot(w.T, x)[0][0] * y > 0:
             correct += 1
     return correct / len(x_list)
 
 
 # 导入数据
-data_set = np.loadtxt('data_x1x2x3y.csv', dtype=int, delimiter=',', skiprows=1)
+data_set = np.loadtxt('data_x1x2x3y.csv', dtype=np.int64, delimiter=',', skiprows=1)
 x_list = []
 y_list = []
 for data in data_set:
