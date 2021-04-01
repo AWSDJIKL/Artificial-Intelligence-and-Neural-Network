@@ -43,12 +43,9 @@ def d_sigmoid_d_x(x):
 # pyplot.legend()
 # pyplot.show()
 
-# w = np.random.rand(2, 4)
-# x = np.random.rand(2, 1)
-# b = np.random.rand(4, 1)
-w = np.array([[1, 1, 2, 2], [3, 3, 4, 4]])
-x = np.array([2, 2])
-b = np.array([1, 1, 1, 1])
-# print(sigmoid(x))
+
+w = np.random.rand(4, 1)
+b = np.random.rand(4, 1)
 print(w.shape)
-print(np.matmul(x, w) + b)
+print(b.shape)
+print((w + b).shape)
