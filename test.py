@@ -7,7 +7,8 @@
 # @File : test.py
 from matplotlib import pyplot
 import numpy as np
-
+import datetime
+import pandas as pd
 
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
@@ -44,8 +45,10 @@ def d_sigmoid_d_x(x):
 # pyplot.show()
 
 
-w = np.random.rand(4, 1)
-b = np.random.rand(4, 1)
-print(w.shape)
-print(b.shape)
-print((w + b).shape)
+# w = np.random.rand(4, 1)
+# b = np.random.rand(4, 1)
+# print(w.shape)
+# print(b.shape)
+# print((w + b).shape)
+
+print(pd.to_datetime("19020101"))
