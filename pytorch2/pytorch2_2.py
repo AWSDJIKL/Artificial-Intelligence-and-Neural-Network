@@ -14,36 +14,22 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import datetime
+import time
 
 
 # 读取数据集并分割
 def load_data():
-    data = pd.read_csv("meant.csv", usecols=(1, 2))
-    # print(data.iloc[33108])
-    x1 = data["meant"].iloc[0:-6]
-    x2 = data["meant"].iloc[1:-5]
-    x3 = data["meant"].iloc[2:-4]
-    x4 = data["meant"].iloc[3:-3]
-    x5 = data["meant"].iloc[4:-2]
-    x6 = data["meant"].iloc[5:-1]
-    y_data = data["meant"].iloc[6:]
-    x = np.zeros((6, x1.shape[0]))
-    y = np.zeros((1, y_data.shape[0]))
-    x[0, :] = x1
-    x[1, :] = x2
-    x[2, :] = x3
-    x[3, :] = x4
-    x[4, :] = x5
-    x[5, :] = x6
-    y[0, :] = y_data
-    y=y[0]
-    x_train = x[:, :33108]
+    data = np.loadtxt("meant.csv", delimiter=",", skiprows=1, usecols=2)
+    x = np.zeros((data.shape[0] - 6, 6))
+    y = np.zeros((data.shape[0] - 6, 1))
+    for i in range(6):
+        x[:, i] = data[i:-(6 - i)]
+    y[:, 0] = data[6:]
+    x_train = x[:33108]
     y_train = y[:33108]
-    x_test = x[:, 33108:]
+    x_test = x[33108:]
     y_test = y[33108:]
     # print(x_train)
-    print(y_train)
-    print(y_test.shape[0])
     return x_train, y_train, x_test, y_test
 
 
@@ -62,7 +48,6 @@ class Net(nn.Module):
         x = torch.sigmoid(self.fc1(x))
         x = torch.sigmoid(self.fc2(x))
         x = torch.sigmoid(self.fc3(x))
-        x = x.squeeze(-1)
         return x
 
 
@@ -74,7 +59,7 @@ def train(net, x, y, lr, epouch):
         # 遍历整个训练集
         for j in myrange:
             # 提取x,y
-            x_ture = torch.tensor(x[:, j], dtype=torch.float32)
+            x_ture = torch.tensor(x[j], dtype=torch.float32)
             y_ture = torch.tensor(y[j], dtype=torch.float32)
             # 梯度归零
             net.zero_grad()
@@ -93,13 +78,11 @@ def train(net, x, y, lr, epouch):
 def test(x_test, y_test):
     ypredlist = []
     for j in range(y_test.shape[0]):
-        xt = torch.tensor(x_test[:, j], dtype=torch.float32)
+        xt = torch.tensor(x_test[j], dtype=torch.float32)
         ypred = net(xt)
         ypredlist.append(np.array(ypred.data))
     ypredlist = np.array(ypredlist)
     ypredlist = ypredlist.reshape(y_test.shape[0])
-    print(ypredlist)
-    print(y_test)
     MSE = np.sum((y_test - ypredlist) ** 2) / y_test.shape[0]
     # 画图
     plt.figure(figsize=(10, 5))
@@ -110,13 +93,17 @@ def test(x_test, y_test):
     plt.title('MSE=%5.2f' % MSE)
     plt.savefig('out2.jpg', dpi=256)
     plt.close()
+    print(MSE)
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     net = Net()
     x_train, y_train, x_test, y_test = load_data()
     ##train loop
-    lr = 0.1
+    lr = 0.01
     epouch = 200
     train(net, x_train, y_train, lr, epouch)
     test(x_test, y_test)
+    end_time = time.time()
+    print("用时：{}min".format((end_time - start_time) / 60))
