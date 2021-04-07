@@ -14,27 +14,6 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import time
 
-# 定义数据集类，需要集成torch.utils.data.Dataset类，至少重写init,geiitem,len三个魔法方法
-class MeantDataset(Dataset):
-    def __init__(self, file_path):
-        super(MeantDataset, self).__init__()
-        # 只要第三列
-        data = np.loadtxt(file_path, delimiter=",", skiprows=1, usecols=2)
-        x = np.zeros((data.shape[0] - 6, 6))
-        y = np.zeros((data.shape[0] - 6, 1))
-        for i in range(6):
-            x[:, i] = data[i:-(6 - i)]
-        y[:, 0] = data[6:]
-        self.x = torch.from_numpy(x)
-        self.y = torch.from_numpy(y)
-        self.len = len(self.x)
-
-    def __getitem__(self, index):
-        return self.x[index], self.y[index]
-
-    def __len__(self):
-        return self.len
-
 
 # 定义训练数据集类
 class MeantTrainDataset(Dataset):
@@ -146,7 +125,7 @@ def test(model, test_loader):
 
 
 if __name__ == '__main__':
-    start_time=time.time()
+    start_time = time.time()
     model = MeantModel()
     train_set = MeantTrainDataset("meant.csv")
     test_set = MeantTestDataset("meant.csv")
