@@ -93,7 +93,7 @@ def test(x_test, y_test):
     plt.legend()
     plt.grid()
     plt.title('MSE=%5.2f' % MSE)
-    plt.savefig('out.jpg', dpi=256)
+    plt.savefig('out1.jpg', dpi=256)
     plt.close()
 
 

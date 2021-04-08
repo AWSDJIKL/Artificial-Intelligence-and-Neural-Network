@@ -12,6 +12,8 @@ import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import time
+import pandas as pd
+
 
 # 定义数据集类，需要集成torch.utils.data.Dataset类，至少重写init,geiitem,len三个魔法方法
 class MeantDataset(Dataset):
@@ -39,13 +41,15 @@ class MeantDataset(Dataset):
 class MeantTrainDataset(Dataset):
     def __init__(self, file_path):
         super(MeantTrainDataset, self).__init__()
-        # 只要第三列
-        data = np.loadtxt(file_path, delimiter=",", skiprows=1, usecols=2)
-        x = np.zeros((33108 - 6, 6))
-        y = np.zeros((33108 - 6, 1))
-        for i in range(6):
-            x[:, i] = data[i:33108 - (6 - i)]
-        y[:, 0] = data[6:33108]
+        data = pd.read_csv(file_path, usecols=(1, 2), dtype={"date": str})
+        # 数据预处理，把-999度的去掉
+        data = data.drop(data[data["meant"] == -999].index).reset_index(drop=True)
+        i = data[data["date"] == "19920101"].index[0]
+        x = np.zeros((i - 6, 6))
+        y = np.zeros((i - 6, 1))
+        for j in range(6):
+            x[:, j] = data["meant"].iloc[j:i - (6 - j)]
+        y[:, 0] = data["meant"].iloc[6:i]
         self.x = torch.from_numpy(x)
         self.y = torch.from_numpy(y)
         self.len = len(self.x)
@@ -61,13 +65,15 @@ class MeantTrainDataset(Dataset):
 class MeantTestDataset(Dataset):
     def __init__(self, file_path):
         super(MeantTestDataset, self).__init__()
-        # 只要第三列
-        data = np.loadtxt(file_path, delimiter=",", skiprows=1, usecols=2)
-        x = np.zeros((data.shape[0] - 33108 - 6, 6))
-        y = np.zeros((data.shape[0] - 33108 - 6, 1))
-        for i in range(6):
-            x[:, i] = data[33108 + i: -(6 - i)]
-        y[:, 0] = data[33108 + 6:]
+        data = pd.read_csv(file_path, usecols=(1, 2), dtype={"date": str})
+        # 数据预处理，把-999度的去掉
+        data = data.drop(data[data["meant"] == -999].index).reset_index(drop=True)
+        i = data[data["date"] == "19920101"].index[0]
+        x = np.zeros((data.shape[0] - i - 6, 6))
+        y = np.zeros((data.shape[0] - i - 6, 1))
+        for j in range(6):
+            x[:, j] = data["meant"].iloc[i + j: -(6 - j)]
+        y[:, 0] = data["meant"].iloc[i + 6:]
         self.x = torch.from_numpy(x)
         self.y = torch.from_numpy(y)
         self.len = len(self.x)
@@ -92,9 +98,9 @@ class MeantModel(nn.Module):
 
     def forward(self, x):
         # If the size is a square you can only specify a single number
-        x = self.sigmoid(self.fc1(x))
-        x = self.sigmoid(self.fc2(x))
-        x = self.sigmoid(self.fc3(x))
+        x = self.fc1(x)
+        x = self.fc2(x)
+        x = self.fc3(x)
         # x = x.squeeze(-1)
         return x
 
@@ -140,19 +146,21 @@ def test(model, test_loader):
     plt.title('MSE=%5.2f' % MSE)
     plt.savefig('out2_framework.jpg', dpi=256)
     plt.close()
+    print(y_pred_list)
+    print(y_true_list)
     print(MSE)
     return
 
 
 if __name__ == '__main__':
-    start_time=time.time()
+    start_time = time.time()
     model = MeantModel()
     train_set = MeantTrainDataset("pytorch2/meant.csv")
     test_set = MeantTestDataset("pytorch2/meant.csv")
     criterion = torch.nn.MSELoss()
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
-    train_loader = DataLoader(dataset=train_set, batch_size=12, shuffle=True, num_workers=8)
-    test_loader = DataLoader(dataset=test_set, batch_size=12, shuffle=False, num_workers=8)
+    optimizer = torch.optim.ASGD(model.parameters(), lr=1e-5)
+    train_loader = DataLoader(dataset=train_set, batch_size=40, shuffle=True, num_workers=8)
+    test_loader = DataLoader(dataset=test_set, batch_size=40, shuffle=False, num_workers=8)
     train(model, train_loader, criterion, optimizer, epoch=200)
     test(model, test_loader)
     end_time = time.time()
