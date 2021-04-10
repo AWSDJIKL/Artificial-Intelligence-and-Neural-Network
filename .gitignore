@@ -1,0 +1,5 @@
+# ignore pytorch model
+*.pth
+model/
+# ignore python environment
+venv/
