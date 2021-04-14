@@ -16,11 +16,13 @@ import numpy as np
 
 def cat_dog_build_dataset(dataset_path):
     l = [i for i in range(100)]
-    random.shuffle(l)
+
     train_set_data = np.zeros((140, 3, 128, 128))
     test_set_data = np.zeros((60, 3, 128, 128))
     train_set_label = np.zeros((140))
     test_set_label = np.zeros((60))
+
+    random.shuffle(l)
     # 取70张猫作为训练集
     for i in range(70):
         image = cv2.imread(os.path.join(dataset_path, "cat.{}.jpg".format(l[i])))
@@ -43,6 +45,8 @@ def cat_dog_build_dataset(dataset_path):
         test_set_data[i - 70, 0, :, :] = r
         test_set_data[i - 70, 1, :, :] = g
         test_set_data[i - 70, 2, :, :] = b
+
+    random.shuffle(l)
     # 再随机取70张狗
     for i in range(70):
         image = cv2.imread(os.path.join(dataset_path, "dog.{}.jpg".format(l[i])))
@@ -56,7 +60,7 @@ def cat_dog_build_dataset(dataset_path):
         train_set_data[i + 70, 2, :, :] = b
     # 剩下30张狗作为测试集
     for i in range(70, 100):
-        image = cv2.imread(os.path.join(dataset_path, "cat.{}.jpg".format(l[i])))
+        image = cv2.imread(os.path.join(dataset_path, "dog.{}.jpg".format(l[i])))
         image = cv2.resize(image, (128, 128))
         r = image[:, :, 2]
         g = image[:, :, 1]
@@ -78,21 +82,21 @@ def cat_dog_build_dataset(dataset_path):
 class CDDataset(Dataset):
     def __init__(self, mode="train"):
         super(CDDataset, self).__init__()
-        self.lables = []
+        self.labels = []
         self.images = []
         self.len = 0
         if mode == "train":
             # 是训练集
-            self.lables = torch.tensor(np.load("train_set_label.npy"), dtype=torch.long)
+            self.labels = torch.tensor(np.load("train_set_label.npy"), dtype=torch.long)
             self.images = torch.tensor(np.load("train_set_data.npy") / 256.0, dtype=torch.float32)
-            self.len = len(self.lables)
+            self.len = len(self.labels)
         elif mode == "test":
-            self.lables = torch.tensor(np.load("test_set_label.npy"), dtype=torch.long)
+            self.labels = torch.tensor(np.load("test_set_label.npy"), dtype=torch.long)
             self.images = torch.tensor(np.load("test_set_data.npy") / 256.0, dtype=torch.float32)
-            self.len = len(self.lables)
+            self.len = len(self.labels)
 
     def __getitem__(self, index):
-        return self.images[index, :, :, :], self.lables[index]
+        return self.images[index, :, :, :], self.labels[index]
 
     def __len__(self):
         return self.len

@@ -40,6 +40,9 @@ def test(model, train_loader, test_loader):
         out = np.argmax(out, axis=1)
         # 与真实值对比
         result = out == y
+        print("out", out)
+        print("y", y)
+        # print(result)
         test_set_acc += sum(result == True)
         num += len(result)
     test_set_acc /= num
@@ -51,7 +54,7 @@ def test(model, train_loader, test_loader):
 
 if __name__ == '__main__':
     start_time = time.time()
-    model_path = "CatDogTrain.pth"
+    model_path = "model/CatDogTrain_32.pth"
     model = torch.load(model_path)
     train_set = CDBD.CDDataset(mode="train")
     test_set = CDBD.CDDataset(mode="test")

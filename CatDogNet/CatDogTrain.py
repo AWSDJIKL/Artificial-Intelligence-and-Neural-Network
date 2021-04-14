@@ -50,7 +50,7 @@ def train(model, train_loader, test_loader, criterion, optimizer, epoch):
     plt.legend()
     plt.grid()
     plt.title('acc')
-    plt.savefig('CatDogTrain_32_acc.jpg', dpi=256)
+    plt.savefig('CatDogTrain_acc.jpg', dpi=256)
     plt.close()
 
     return
@@ -62,16 +62,16 @@ if __name__ == '__main__':
     train_set = CDBD.CDDataset(mode="train")
     test_set = CDBD.CDDataset(mode="test")
     train_loader = DataLoader(dataset=train_set, batch_size=35, shuffle=True, num_workers=8)
-    test_loader = DataLoader(dataset=test_set, batch_size=35, shuffle=False, num_workers=8)
+    test_loader = DataLoader(dataset=test_set, batch_size=30, shuffle=False, num_workers=8)
     # 分类问题常用交叉熵损失函数
     criterion = nn.CrossEntropyLoss()
     # 使用随机梯度下降法作为优化器
-    optimizer = torch.optim.SGD(model.parameters(), lr=0.03)
-    train(model, train_loader, test_loader, criterion, optimizer, epoch=400)
+    optimizer = torch.optim.ASGD(model.parameters(), lr=0.03)
+    train(model, train_loader, test_loader, criterion, optimizer, epoch=1000)
     # 设置模型保存路径
     model_save_path = "model"
     if not os.path.exists(model_save_path):
         os.mkdir(model_save_path)
-    torch.save(model, os.path.join(model_save_path, "CatDogTrain_32.pth"))
+    torch.save(model, os.path.join(model_save_path, "CatDogTrain.pth"))
     end_time = time.time()
     print("用时：{}min".format((end_time - start_time) / 60))
