@@ -54,11 +54,15 @@ def d_sigmoid_d_x(x):
 
 data = [1, 1, 1, 1, 1, 1]
 w = [1, 2, -1, -4, 3, 1]
-for i in range(30):
-    new = 0
-    for j in range(6):
-        new += data[-(j + 1)] * w[j]
-    data.append(new)
-df = pd.DataFrame(data)
-df.columns = ["meant"]
-df.to_csv("test.csv")
+w = np.array(w)
+tw = np.zeros((len(w) - 2))
+# for i in range(30):
+#     new = 0
+#     for j in range(6):
+#         new += data[-(j + 1)] * w[j]
+#     data.append(new)
+# df = pd.DataFrame(data)
+# df.columns = ["meant"]
+# df.to_csv("test.csv")
+print(w[2:] - w[2 - 1:-1])
+tw[:] = w[2:] - w[2 - 1:-1]
