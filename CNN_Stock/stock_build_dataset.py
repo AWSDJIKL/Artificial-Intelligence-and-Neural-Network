@@ -12,7 +12,25 @@ import torch
 from torch.utils.data import Dataset
 
 
+def normalized_data(data):
+    '''
+    数据归一化
+
+    :param data:
+    :return:
+    '''
+    data_max = np.max(data)
+    data_min = np.min(data)
+    return np.array([(i - data_min) / (data_max - data_min) for i in data])
+
+
 def init_stock_data(train_set_size):
+    '''
+    数据初始化
+
+    :param train_set_size: 训练集大小
+    :return:
+    '''
     # train_set_size = 50000
     # 读取数据
     data = pd.read_csv("pinganbank_5min.csv", delimiter=",")
@@ -23,24 +41,23 @@ def init_stock_data(train_set_size):
 
     # 制造容器
     data_size = len(data)
-    ts_size = 256
+    ts_size = 60
     open_x = np.zeros((data_size - ts_size, ts_size))
     high_x = np.zeros((data_size - ts_size, ts_size))
     low_x = np.zeros((data_size - ts_size, ts_size))
     close_x = np.zeros((data_size - ts_size, ts_size))
     label = np.zeros((data_size - ts_size))
-    print(len(label))
-    print(close_data[ts_size:])
-    print(close_data[ts_size - 1:-1])
+    # print(len(label))
+    # print(close_data[ts_size:])
+    # print(close_data[ts_size - 1:-1])
     # print(len(close_data[ts_size:] - close_data[ts_size - 1:-1]))
-    print(close_data[ts_size:] - close_data[ts_size - 1:-1])
+    # print(close_data[ts_size:] - close_data[ts_size - 1:-1])
     # 填充数据
     for i in range(ts_size):
-        open_x[:, i] = open_data[i:(data_size - ts_size + i)]
-        high_x[:, i] = high_data[i:(data_size - ts_size + i)]
-        low_x[:, i] = low_data[i:(data_size - ts_size + i)]
-        close_x[:, i] = close_data[i:(data_size - ts_size + i)]
-
+        open_x[:, i] = normalized_data(open_data[i:(data_size - ts_size + i)])
+        high_x[:, i] = normalized_data(high_data[i:(data_size - ts_size + i)])
+        low_x[:, i] = normalized_data(low_data[i:(data_size - ts_size + i)])
+        close_x[:, i] = normalized_data(close_data[i:(data_size - ts_size + i)])
     label[:] = close_data[ts_size:] - close_data[ts_size - 1:-1]
     label = (label > 0) * 1
 
@@ -58,6 +75,11 @@ def init_stock_data(train_set_size):
 
 class StockDataset(Dataset):
     def __init__(self, mode="train"):
+        '''
+        股票数据集类
+
+        :param mode: 是训练/测试集
+        '''
         super(StockDataset, self).__init__()
         if mode == "train":
             self.x = torch.tensor(np.load("stock_train_data.npy"), dtype=torch.float32)
@@ -74,6 +96,6 @@ class StockDataset(Dataset):
 
 
 if __name__ == '__main__':
-    # init_stock_data(50000)
-    train_set = StockDataset()
-    print(train_set[0])
+    init_stock_data(50000)
+    # train_set = StockDataset()
+    # print(train_set[0])

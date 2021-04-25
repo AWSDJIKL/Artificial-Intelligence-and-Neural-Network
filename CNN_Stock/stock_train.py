@@ -91,17 +91,18 @@ def train(model, train_loader, test_loader, criterion, optimizer, epoch):
     plt.title('acc')
     plt.savefig('Stock_Train_acc.jpg', dpi=256)
     plt.close()
+
     return
 
 
 if __name__ == '__main__':
     start_time = time.time()
-    train_loader = DataLoader(sbd.StockDataset(mode="train"), batch_size=40, shuffle=True, num_workers=8)
-    test_loader = DataLoader(sbd.StockDataset(mode="test"), batch_size=40, shuffle=False, num_workers=8)
+    train_loader = DataLoader(sbd.StockDataset(mode="train"), batch_size=40, shuffle=True)
+    test_loader = DataLoader(sbd.StockDataset(mode="test"), batch_size=40, shuffle=False)
     model = sm.StockModel()
     criterion = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.SGD(model.parameters(), lr=0.03)
-    epoch = 200
+    epoch = 1
     train(model, train_loader, test_loader, criterion, optimizer, epoch)
     torch.save(model, "Stock_Train.pth")
     end_time = time.time()
