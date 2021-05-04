@@ -16,14 +16,15 @@ def trans(seq, toindex):
 
 def get_indtag():
     # 训练数据，分词+对应词性
+
     train_data = [
         ("A simple lookup table that stores embeddings of a fixed dictionary and size".split(),
-         []),
+         ["ART", "ADJ", "V", "NN", "CONJ", "NN", "V", "PREP", "ART", "ADJ", "NN", "CONJ", "NN"]),
         ("This module is often used to store word embeddings and retrieve them using indices".split(),
-         []),
+         ["ART", "NN", "V", "ADV", "V", "PREP", "V", "NN", "NN", "CONJ", "V", "NN", "V", "NN"]),
         ("The input to the module is a list of indices, and the output is the corresponding word embeddings".split(),
-         [])
-    ]
+         ["ART", "NN", "PREP", "ART", "NN", "V", "ART", "NN", "PREP", "NN", "CONJ", "ART", "NN", "V", "ART", "ADJ",
+          "NN", "NN"])]
     # 测试数据，仅分词
     test_data = [("This is a simple list of word").split()]
     # 为词赋予编号
@@ -33,7 +34,7 @@ def get_indtag():
             if word not in word_to_index:
                 word_to_index[word] = len(word_to_index)
     # 为词赋予词性tag
-    tag_to_index = {}
+    tag_to_index = {"DET": 0, "NN": 1, "V": 2, "ART": 3, "ADJ": 4, "CONJ": 5, "PREP": 6, "ADV": 7}
     train_x = []
     train_y = []
     for i in train_data:

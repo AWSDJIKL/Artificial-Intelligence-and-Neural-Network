@@ -14,10 +14,10 @@ class WCDModel(nn.Module):
         super(WCDModel, self).__init__()
         # 分词，得到输入语句里的词的分布矩阵[语句中词的数量。词的种类]
         # 要求输入(词汇量大小，每个词汇向量表示的向量为度)
-        self.word = nn.Embedding(9, 10)
-        self.lstm = nn.LSTM(input_size=10, hidden_size=3, num_layers=1, dropout=0)
+        self.word = nn.Embedding(45, 46)
+        self.lstm = nn.LSTM(input_size=46, hidden_size=10, num_layers=1, dropout=0)
         self.linear = nn.Sequential(
-            nn.Linear(3, 3),
+            nn.Linear(10, 8),
             nn.Softmax(dim=1)
         )
 
